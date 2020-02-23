@@ -52,10 +52,11 @@ router.post(
   functions.authenticateUser,
   functions.asyncHandler(async (req, res) => {
     try {
+        console.log(req.body);
       const course = await Course.create(req.body);
       res
         .status(201)
-        .location("/courses" + course.id)
+        .location("/courses/" + course.id)
         .end();
     } catch (error) {
       if (error.name === "SequelizeValidationError") {
@@ -75,8 +76,12 @@ router.put(
       const user = req.currentUser;
       const course = await Course.findByPk(req.params.id);
       if (user.id === course.userId) {
-        await course.update(req.body);
-        res.status(204).end();
+        if (req.body.title && req.body.description) {
+            await course.update(req.body);
+            res.status(204).end();
+        } else {
+            res.status(400).json({ message: "title is required,  description is required" });
+        }
       } else {
         res.status(403).json({ message: "You don't have permissions" });
       }

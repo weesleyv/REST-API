@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true
       },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
       title: {
         type: DataTypes.STRING,
         allowNull: false
@@ -16,8 +20,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false
       },
-      estimatedTime: DataTypes.STRING,
-      materialsNeeded: DataTypes.STRING
+      estimatedTime: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      materialsNeeded: {
+        type: DataTypes.STRING,
+        allowNull: true
+      }
     },
     {}
   );

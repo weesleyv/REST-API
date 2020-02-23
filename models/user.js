@@ -14,21 +14,40 @@ module.exports = (sequelize, DataTypes) => {
       firstName: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Name is required"
+          }
+        }
       },
       lastName: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Last name is required"
+          }
+        }
       },
       emailAddress: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isEmail: true
+          isEmail: true,
+          notEmpty: true,
+          async isUnique(email) {
+            const user =  await User.findAll({where: {
+              emailAddress: email
+            }});
+            if (user) {
+              throw new Error("email already registered")
+            }
+          }
         }
       },
       password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
       }
     },
     {
