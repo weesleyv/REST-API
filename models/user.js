@@ -36,11 +36,17 @@ module.exports = (sequelize, DataTypes) => {
           isEmail: true,
           notEmpty: true,
           async isUnique(email) {
-            const user =  await User.findAll({where: {
-              emailAddress: email
-            }});
-            if (user) {
-              throw new Error("email already registered")
+            try {
+              const user = await User.findOne({
+                where: {
+                  emailAddress: email
+                }
+              });
+              if (user) {
+                throw new Error("email already registered");
+              }
+            } catch (error) {
+              next(error);
             }
           }
         }

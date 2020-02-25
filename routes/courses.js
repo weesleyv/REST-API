@@ -28,7 +28,7 @@ router.get(
 //Returns a the course (including the user that owns the course) for the provided course ID
 router.get(
   "/courses/:id",
-  functions.asyncHandler(async (req, res) => {
+  functions.asyncHandler(async (req, res, next) => {
     const course = await Course.findByPk(req.params.id, {
       attributes: {
         exclude: ["createdAt", "updatedAt"]
@@ -42,7 +42,11 @@ router.get(
         }
       ]
     });
-    res.json(course);
+    if (course) {
+      res.json(course);
+    } else {
+      next();
+    }
   })
 );
 
@@ -52,7 +56,7 @@ router.post(
   functions.authenticateUser,
   functions.asyncHandler(async (req, res) => {
     try {
-        console.log(req.body);
+      console.log(req.body);
       const course = await Course.create(req.body);
       res
         .status(201)
@@ -77,10 +81,12 @@ router.put(
       const course = await Course.findByPk(req.params.id);
       if (user.id === course.userId) {
         if (req.body.title && req.body.description) {
-            await course.update(req.body);
-            res.status(204).end();
+          await course.update(req.body);
+          res.status(204).end();
         } else {
-            res.status(400).json({ message: "title is required,  description is required" });
+          res
+            .status(400)
+            .json({ message: "title is required,  description is required" });
         }
       } else {
         res.status(403).json({ message: "You don't have permissions" });
@@ -98,7 +104,7 @@ router.put(
 router.delete(
   "/courses/:id",
   functions.authenticateUser,
-  functions.asyncHandler(async (req, res) => {
+  functions.asyncHandler(async (req, res, next) => {
     const user = req.currentUser;
     const course = await Course.findByPk(req.params.id);
     if (user.id === course.userId) {
